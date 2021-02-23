@@ -2,107 +2,80 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateContactRequest;
+use App\Http\Requests\ShareContactRequest;
+use App\Http\Requests\UpdateContactRequest;
 use App\Models\Contact;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ContactController extends Controller
 {
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        $contacts = auth()->user()->accessibleProjects();
+        $contacts = Auth::user()->accessibleContacts();
 
-        return view('contacts.index', compact('contacts'));
+        $sharedContacts = Auth::user()->shared;
+
+        $users = User::all()->except(Auth::id());
+
+        return view('contacts.index', compact('contacts', 'sharedContacts', 'users'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         return view('contacts.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store()
+    public function store(CreateContactRequest $request)
     {
-        $contact = auth()->user()->contacts()->create($this->validateRequest());
-
-
-        if (request()->wantsJson()) {
-            return ['message' => $contact->path()];
-        }
+        $contact = auth()->user()->contacts()->create($request->all());
 
         return redirect($contact->path());
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Contact $contact)
+    public function show($id)
     {
+        $contact = auth()->user()->contacts()->find($id);
+
         return view('contacts.show', compact('contact'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Contact $contact)
     {
         return view('contacts.edit',compact('contact'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update( Contact $contact)
+    public function update(UpdateContactRequest $request, Contact $contact)
     {
-        $contact->update($this->validateRequest());
+        $contact->update($request->all());
 
         return redirect($contact->path());
     }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
 
     public function destroy(Contact $contact)
     {
         $contact->delete();
 
-        return redirect('/contacts');
+        return redirect('/contacts')->with('success', 'Contact removed');
     }
 
-    protected function validateRequest()
+    public function share(Request $request, Contact $contact)
     {
-        return request()->validate([
-            'name' => 'sometimes|required',
-            'phone' => 'sometimes|required'
-        ]);
+        if ($contact->sharing()->where('id', $request->input('selectedUsers'))->exists()){
+            return redirect()->back()->with('error', 'You already sharing this contact with this user');
+        }
+        $contact->sharing()->attach($request->input('selectedUsers'));
+
+        return redirect()->back()->with('success', 'Contact shared');
     }
+
+    public function stopShare(Contact $contact, Request $request)
+    {
+        $contact->sharing()->detach($request->input('stopShare'));
+
+        return redirect()->back()->with('success', 'You stopped sharing this contact');
+    }
+
 }

@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ContactApiController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\ContactController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +25,8 @@ Route::get('/', function () {
 
 });
 
+Route::post('{contact}/share', [ContactController::class, 'share'])->name('share.share');
+Route::post('{contact}/stopShare', [ContactController::class, 'stopShare'])->name('stop.share');
 
 Route::group(['middleware' => 'auth'], function () {
     Route::resource('contacts', ContactController::class);

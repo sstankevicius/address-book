@@ -11,6 +11,7 @@ class Contact extends Model
 
     protected $guarded = [];
 
+
     public function path()
     {
         return "/contacts/{$this->id}";
@@ -20,5 +21,12 @@ class Contact extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function sharing()
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot(['user_id']);
+    }
+
 
 }
