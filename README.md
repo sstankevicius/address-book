@@ -21,7 +21,7 @@ docker-compose exec app vendor/bin/phpunit tests/Unit/ContactTest.php
 
 ## API
 
-###### Registration
+### Registration
 
 POST /api/register
 
@@ -32,7 +32,7 @@ requires
 
 returns Bearer Token
 
-###### Login
+### Login
 
 POST /api/login
 
@@ -41,7 +41,7 @@ requires
 "email","password"
 }
 
-###### Get all contacts
+### Get all contacts
 
 GET /api/contacts
 
@@ -50,7 +50,7 @@ yourContacts[] = User contacts
 sharedContacts[] = Contacts shared by other users
 sharing[] = Contacts which user shares with other users
 
-###### Post contact
+### Post contact
 
 POST /api/contacts
 
@@ -62,13 +62,13 @@ required
 if success returns
 created contact
 
-###### Get 1 contact
+### Get 1 contact
 
 GET /api/contacts/{id}
 
 returns contact
 
-###### Update contact
+### Update contact
 
 PUT /api/contacts/{id}
 
@@ -79,13 +79,13 @@ required
 
 returns success message
 
-###### Delete contact
+### Delete contact
 
 DELETE /api/contacts/{id}
 
 returns success
 
-###### Share contact
+### Share contact
 
 /api/share
 
@@ -101,7 +101,7 @@ Validation: cannot share with same person twice, cannot share with himself, chec
 returns
 if success true otherwise error message
 
-###### Stop sharing contact
+### Stop sharing contact
 
 /api/stopShare
 
