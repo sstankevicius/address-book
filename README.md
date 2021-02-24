@@ -4,6 +4,8 @@
 
 git clone https://github.com/sstankevicius/address-book.git
 
+Change env.example to .env
+
 docker-compose up -d
 
 Composer install
